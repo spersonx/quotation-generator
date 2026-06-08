@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>报价易 - 专业报价，一键即达</title>
+  <meta name="description" content="报价易是一款在线报价单生成器，支持Excel导入、多模板选择、PDF导出，数据不存储，保护客户隐私。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ========== Reset ========== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    ul, ol { list-style: none; }
+
+    /* ========== Design Tokens (OKLCH) ========== */
+    :root {
+      --ink: oklch(0.15 0.02 260);
+      --ink-secondary: oklch(0.40 0.02 260);
+      --ink-muted: oklch(0.55 0.015 260);
+      --seal: oklch(0.35 0.12 260);
+      --seal-light: oklch(0.93 0.03 260);
+      --seal-dark: oklch(0.25 0.14 260);
+      --bg: oklch(0.99 0.002 260);
+      --surface: oklch(1.0 0 0);
+      --rule: oklch(0.90 0.005 260);
+      --rule-strong: oklch(0.75 0.01 260);
+      --display: 'ZCOOL XiaoWei', 'SimSun', '宋体', serif;
+      --body: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+      --measure: 64ch;
+      --grid-max: 1080px;
+      --gap: clamp(24px, 4vw, 48px);
+    }
+
+    /* ========== Utility ========== */
+    .container { max-width: var(--grid-max); margin: 0 auto; padding: 0 24px; }
+
+    /* ========== Navigation ========== */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--rule);
+      transition: box-shadow 0.3s ease;
+    }
+    .navbar.scrolled { box-shadow: 0 1px 8px oklch(0.0 0 0 / 0.06); }
+    .navbar-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px; max-width: var(--grid-max); margin: 0 auto; padding: 0 24px;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
+    .nav-seal {
+      width: 32px; height: 32px;
+      border: 2px solid var(--seal);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--display);
+      font-size: 16px; color: var(--seal);
+      line-height: 1;
+    }
+    .nav-brand-text {
+      font-family: var(--display);
+      font-size: 20px; color: var(--ink);
+    }
+    .nav-brand-text em {
+      font-style: normal; color: var(--seal);
+    }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a {
+      font-size: 14px; color: var(--ink-secondary);
+      font-weight: 500; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--seal); }
+    .nav-cta {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--seal); color: #ffffff !important;
+      font-size: 14px; font-weight: 600;
+      padding: 7px 18px; border-radius: 6px;
+      border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .nav-cta:hover { background: var(--seal-dark); color: #ffffff !important; transform: translateY(-1px); }
+
+    /* ========== Hero ========== */
+    .hero {
+      padding: clamp(100px, 12vh, 160px) 0 clamp(60px, 8vh, 100px);
+      position: relative;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: clamp(32px, 5vw, 64px);
+      align-items: center;
+    }
+    .hero-content { max-width: var(--measure); }
+    .hero h1 {
+      font-family: var(--display);
+      font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+      font-weight: 400;
+      line-height: 1.3;
+      color: var(--ink);
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+    }
+    .hero h1 strong {
+      font-weight: 400;
+      color: var(--seal);
+    }
+    .hero-lead {
+      font-size: 1.0625rem;
+      color: var(--ink-secondary);
+      line-height: 1.8;
+      margin-bottom: 32px;
+      max-width: 52ch;
+    }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--seal); color: var(--surface);
+      font-size: 15px; font-weight: 600;
+      padding: 12px 28px; border-radius: 6px;
+      border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: var(--seal-dark); transform: translateY(-1px); }
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--ink);
+      font-size: 15px; font-weight: 500;
+      padding: 12px 28px; border-radius: 6px;
+      border: 1px solid var(--rule-strong); cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--seal); color: var(--seal); }
+
+    /* ========== Hero Mockup ========== */
+    .hero-mockup {
+      position: relative;
+    }
+    .mockup-paper {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: clamp(20px, 3vw, 36px);
+      position: relative;
+    }
+    .mockup-paper::before {
+      content: '';
+      position: absolute; top: 0; right: 0;
+      width: 56px; height: 56px;
+      background: var(--ink);
+      clip-path: polygon(100% 0, 0 0, 100% 100%);
+      border-radius: 0 3px 0 0;
+    }
+    .mockup-head {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--ink);
+      margin-bottom: 16px;
+    }
+    .mockup-co { display: flex; align-items: center; gap: 10px; }
+    .mockup-co-mark {
+      width: 36px; height: 36px;
+      background: var(--ink);
+      border-radius: 4px;
+    }
+    .mockup-co-name { font-weight: 700; font-size: 14px; color: var(--ink); }
+    .mockup-co-sub { font-size: 11px; color: var(--ink-muted); }
+    .mockup-doc-title {
+      font-family: var(--display);
+      font-size: clamp(18px, 2.5vw, 26px);
+      color: var(--ink);
+      letter-spacing: 6px;
+    }
+    .mockup-doc-no { font-size: 11px; color: var(--ink-muted); text-align: right; margin-top: 2px; }
+    .mockup-info {
+      display: flex; gap: 24px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 12px;
+    }
+    .mockup-info-block { flex: 1; }
+    .mockup-info-block h4 { font-size: 11px; font-weight: 700; color: var(--seal); margin-bottom: 4px; letter-spacing: 0.04em; }
+    .mockup-info-block p { font-size: 11px; color: var(--ink-secondary); margin: 1px 0; }
+    .mockup-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 11px; }
+    .mockup-table th {
+      background: var(--ink); color: var(--surface);
+      font-weight: 600; padding: 6px 8px; text-align: left;
+    }
+    .mockup-table td { padding: 5px 8px; border-bottom: 1px solid var(--rule); color: var(--ink-secondary); }
+    .mockup-table tr:nth-child(even) td { background: oklch(0.97 0.003 260); }
+    .mockup-table .r { text-align: right; }
+    .mockup-summary { display: flex; justify-content: flex-end; }
+    .mockup-summary-inner { width: 200px; }
+    .mockup-summary-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-secondary); padding: 3px 0; }
+    .mockup-summary-total {
+      display: flex; justify-content: space-between;
+      font-size: 14px; font-weight: 700; color: var(--seal);
+      padding-top: 6px; border-top: 2px solid var(--ink); margin-top: 4px;
+    }
+    .mockup-seal {
+      position: absolute; bottom: 24px; left: 24px;
+      width: 44px; height: 44px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--display);
+      font-size: 14px; color: var(--ink);
+      opacity: 0.3;
+      transform: rotate(-15deg);
+    }
+
+    /* ========== Features ========== */
+    .features {
+      padding: clamp(60px, 10vh, 100px) 0;
+    }
+    .features-header {
+      margin-bottom: clamp(40px, 6vh, 64px);
+    }
+    .features-header h2 {
+      font-family: var(--display);
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 12px;
+      text-wrap: balance;
+    }
+    .features-header p {
+      font-size: 1rem;
+      color: var(--ink-secondary);
+      max-width: 48ch;
+    }
+    .features-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+    }
+    .feature-item {
+      background: var(--surface);
+      padding: clamp(24px, 3vw, 36px);
+      transition: background 0.2s;
+    }
+    .feature-item:hover { background: oklch(0.98 0.003 260); }
+    .feature-num {
+      font-family: var(--display);
+      font-size: 2rem;
+      color: var(--seal);
+      line-height: 1;
+      margin-bottom: 12px;
+      opacity: 0.7;
+    }
+    .feature-item h3 {
+      font-size: 1.0625rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .feature-item p {
+      font-size: 0.875rem;
+      color: var(--ink-secondary);
+      line-height: 1.7;
+    }
+
+    /* ========== How it works ========== */
+    .process {
+      padding: clamp(60px, 10vh, 100px) 0;
+      background: var(--ink);
+      color: var(--surface);
+    }
+    .process-header {
+      margin-bottom: clamp(40px, 6vh, 64px);
+    }
+    .process-header h2 {
+      font-family: var(--display);
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 400;
+      margin-bottom: 12px;
+    }
+    .process-header p {
+      font-size: 1rem;
+      color: oklch(0.7 0.01 260);
+      max-width: 48ch;
+    }
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(20px, 3vw, 40px);
+    }
+    .process-step {
+      position: relative;
+      padding-top: 24px;
+    }
+    .process-step::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: oklch(0.35 0.02 260);
+    }
+    .process-step::after {
+      content: '';
+      position: absolute; top: -3px; left: 0;
+      width: 8px; height: 8px;
+      background: var(--seal);
+      border-radius: 50%;
+    }
+    .process-step:last-child::before {
+      background: linear-gradient(90deg, oklch(0.35 0.02 260), var(--seal));
+    }
+    .process-step h3 {
+      font-size: 1.0625rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      margin-top: 12px;
+    }
+    .process-step p {
+      font-size: 0.875rem;
+      color: oklch(0.65 0.015 260);
+      line-height: 1.7;
+    }
+
+    /* ========== Values ========== */
+    .values {
+      padding: clamp(60px, 10vh, 100px) 0;
+    }
+    .values-header {
+      margin-bottom: clamp(40px, 6vh, 64px);
+    }
+    .values-header h2 {
+      font-family: var(--display);
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    .values-header p {
+      font-size: 1rem;
+      color: var(--ink-secondary);
+      max-width: 48ch;
+    }
+    .values-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(20px, 3vw, 32px);
+    }
+    .value-item {
+      display: flex; gap: 20px;
+      padding: clamp(24px, 3vw, 36px);
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      transition: border-color 0.2s;
+    }
+    .value-item:hover { border-color: var(--seal); }
+    .value-char {
+      flex-shrink: 0;
+      width: 56px; height: 56px;
+      border: 2px solid var(--seal);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--display);
+      font-size: 1.75rem;
+      color: var(--seal);
+      line-height: 1;
+    }
+    .value-item:nth-child(2) .value-char { border-color: oklch(0.40 0.10 240); color: oklch(0.40 0.10 240); }
+    .value-item:nth-child(3) .value-char { border-color: oklch(0.45 0.10 220); color: oklch(0.45 0.10 220); }
+    .value-item:nth-child(4) .value-char { border-color: oklch(0.50 0.10 200); color: oklch(0.50 0.10 200); }
+    .value-text h3 { font-size: 1.0625rem; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+    .value-text p { font-size: 0.875rem; color: var(--ink-secondary); line-height: 1.7; }
+
+    /* ========== CTA ========== */
+    .cta {
+      padding: clamp(60px, 10vh, 100px) 0;
+    }
+    .cta-inner {
+      background: var(--seal);
+      padding: clamp(48px, 6vw, 80px) clamp(32px, 5vw, 64px);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .cta-text h2 {
+      font-family: var(--display);
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+      font-weight: 400;
+      color: var(--surface);
+      margin-bottom: 8px;
+    }
+    .cta-text p {
+      font-size: 1rem;
+      color: oklch(0.85 0.04 260);
+    }
+    .btn-white {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface); color: var(--seal);
+      font-size: 15px; font-weight: 700;
+      padding: 14px 32px; border-radius: 6px;
+      border: none; cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s;
+      white-space: nowrap;
+    }
+    .btn-white:hover { transform: translateY(-1px); box-shadow: 0 4px 16px oklch(0.0 0 0 / 0.15); }
+
+    /* ========== Contact ========== */
+    .contact {
+      padding: clamp(60px, 10vh, 100px) 0;
+    }
+    .contact-grid {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .contact-form {
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .form-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .form-group {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .form-group label {
+      font-size: 0.8125rem; font-weight: 600;
+      color: var(--ink-secondary);
+      letter-spacing: 0.02em;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      font-family: var(--body);
+      font-size: 0.9375rem;
+      padding: 10px 14px;
+      border: 1.5px solid var(--rule-strong);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--ink);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--seal);
+      box-shadow: 0 0 0 3px oklch(0.35 0.12 260 / 0.12);
+    }
+    .form-group textarea {
+      resize: vertical; min-height: 100px;
+    }
+    .form-status {
+      font-size: 0.875rem;
+      padding: 0;
+      transition: all 0.3s;
+    }
+    .form-status.success { color: oklch(0.50 0.15 145); padding: 8px 0; }
+    .form-status.error { color: oklch(0.55 0.15 25); padding: 8px 0; }
+    @media (max-width: 768px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+
+    /* ========== Footer ========== */
+    .footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--rule);
+    }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .footer-brand { display: flex; align-items: center; gap: 8px; }
+    .footer-seal {
+      width: 24px; height: 24px;
+      border: 1.5px solid var(--seal);
+      border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--display);
+      font-size: 11px; color: var(--seal);
+    }
+    .footer-brand span { font-family: var(--display); font-size: 15px; color: var(--ink); }
+    .footer-copy { font-size: 13px; color: var(--ink-muted); }
+
+    /* ========== Responsive ========== */
+    @media (max-width: 768px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-content { text-align: center; }
+      .hero-lead { margin-left: auto; margin-right: auto; }
+      .hero-actions { justify-content: center; }
+      .process-steps { grid-template-columns: 1fr 1fr; }
+      .values-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .cta-inner { flex-direction: column; text-align: center; }
+    }
+    @media (max-width: 480px) {
+      .process-steps { grid-template-columns: 1fr; }
+      .hero-actions { flex-direction: column; align-items: stretch; }
+      .btn-primary, .btn-outline { justify-content: center; }
+    }
+
+    /* ========== Motion ========== */
+    @keyframes reveal {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 1;
+      animation: reveal 0.5s ease-out both;
+    }
+    .reveal-d1 { animation-delay: 0.08s; }
+    .reveal-d2 { animation-delay: 0.16s; }
+    .reveal-d3 { animation-delay: 0.24s; }
+    .reveal-d4 { animation-delay: 0.32s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { animation: none; opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== Navigation ===== -->
+<nav class="navbar" id="navbar">
+  <div class="navbar-inner">
+    <a href="#" class="nav-brand">
+      <div class="nav-seal">报</div>
+      <span class="nav-brand-text">报价<em>易</em></span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">功能</a>
+      <a href="#process">流程</a>
+      <a href="#values">理念</a>
+      <a href="#contact">联系</a>
+      <a href="../" class="nav-cta">开始使用</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== Hero ===== -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-content">
+        <h1 class="reveal">专业报价<br /><strong>一键即达</strong></h1>
+        <p class="hero-lead reveal reveal-d1">用报价易快速生成符合国内规范的报价单。Excel 导入，多模板切换，PDF 导出，数据不离开浏览器。</p>
+        <div class="hero-actions reveal reveal-d2">
+          <a href="../" class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            开始制作
+          </a>
+          <a href="#features" class="btn-outline">了解详情</a>
+        </div>
+      </div>
+
+      <div class="hero-mockup reveal reveal-d3">
+        <div class="mockup-paper">
+          <div class="mockup-head">
+            <div class="mockup-co">
+              <div class="mockup-co-mark"></div>
+              <div>
+                <div class="mockup-co-name">示例科技有限公司</div>
+                <div class="mockup-co-sub">电话：400-888-8888</div>
+              </div>
+            </div>
+            <div>
+              <div class="mockup-doc-title">报 价 单</div>
+              <div class="mockup-doc-no">编号：QT-20260603-001</div>
+            </div>
+          </div>
+          <div class="mockup-info">
+            <div class="mockup-info-block">
+              <h4>客户信息</h4>
+              <p><strong>某某集团有限公司</strong></p>
+              <p>联系人：张经理</p>
+              <p>电话：138-0000-0000</p>
+            </div>
+            <div class="mockup-info-block">
+              <h4>报价信息</h4>
+              <p>报价日期：2026-06-03</p>
+              <p>有效期至：2026-07-03</p>
+              <p>付款条件：预付30%</p>
+            </div>
+          </div>
+          <table class="mockup-table">
+            <thead>
+              <tr>
+                <th>序号</th>
+                <th>项目名称</th>
+                <th>规格</th>
+                <th>单位</th>
+                <th class="r">数量</th>
+                <th class="r">单价</th>
+                <th class="r">小计</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>智能控制系统</td>
+                <td>SC-200</td>
+                <td>套</td>
+                <td class="r">10</td>
+                <td class="r">¥12,800</td>
+                <td class="r">¥128,000</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>传感器模组</td>
+                <td>TS-100</td>
+                <td>个</td>
+                <td class="r">50</td>
+                <td class="r">¥680</td>
+                <td class="r">¥34,000</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>安装调试服务</td>
+                <td>含培训</td>
+                <td>次</td>
+                <td class="r">1</td>
+                <td class="r">¥8,000</td>
+                <td class="r">¥8,000</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mockup-summary">
+            <div class="mockup-summary-inner">
+              <div class="mockup-summary-row"><span>小计</span><span>¥170,000</span></div>
+              <div class="mockup-summary-row"><span>税额（13%）</span><span>¥22,100</span></div>
+              <div class="mockup-summary-total"><span>总计</span><span>¥192,100</span></div>
+            </div>
+          </div>
+          <div class="mockup-seal">印</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Features ===== -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="features-header">
+      <h2>为真实业务场景设计</h2>
+      <p>每一个功能都来自实际报价需求，不是功能的堆砌</p>
+    </div>
+    <div class="features-list">
+      <div class="feature-item">
+        <div class="feature-num">壹</div>
+        <h3>Excel 快速导入</h3>
+        <p>下载标准模板，填好数据一键导入，不用逐条手动录入</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-num">贰</div>
+        <h3>多模板市场</h3>
+        <p>简约、商务、现代、雅致、奢华五大风格，一键切换</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-num">叁</div>
+        <h3>PDF 与图片导出</h3>
+        <p>导出高清 PDF 或图片，直接发送客户</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-num">肆</div>
+        <h3>数据不存储</h3>
+        <p>数据仅存于浏览器，服务器零存储，保护商业信息</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-num">伍</div>
+        <h3>完全免费</h3>
+        <p>无需注册、无需付费，打开即用</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-num">陆</div>
+        <h3>国内标准排版</h3>
+        <p>正文宋体、标题黑体，符合国内正式文档规范</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Process ===== -->
+<section class="process" id="process">
+  <div class="container">
+    <div class="process-header">
+      <h2>四步完成专业报价</h2>
+      <p>引导式填写，从信息录入到导出交付</p>
+    </div>
+    <div class="process-steps">
+      <div class="process-step">
+        <h3>填写信息</h3>
+        <p>录入公司与客户基本信息</p>
+      </div>
+      <div class="process-step">
+        <h3>添加项目</h3>
+        <p>手动输入或 Excel 导入明细</p>
+      </div>
+      <div class="process-step">
+        <h3>选择模板</h3>
+        <p>在模板市场挑选风格</p>
+      </div>
+      <div class="process-step">
+        <h3>导出交付</h3>
+        <p>预览确认后导出 PDF 或图片</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Values ===== -->
+<section class="values" id="values">
+  <div class="container">
+    <div class="values-header">
+      <h2>品牌理念</h2>
+      <p>好的工具让专业触手可及</p>
+    </div>
+    <div class="values-grid">
+      <div class="value-item">
+        <div class="value-char">专</div>
+        <div class="value-text">
+          <h3>专业</h3>
+          <p>符合国内正式文档规范，让每一份报价都彰显专业水准</p>
+        </div>
+      </div>
+      <div class="value-item">
+        <div class="value-char">简</div>
+        <div class="value-text">
+          <h3>简约</h3>
+          <p>引导式流程，去除多余操作，让复杂变简单</p>
+        </div>
+      </div>
+      <div class="value-item">
+        <div class="value-char">安</div>
+        <div class="value-text">
+          <h3>安全</h3>
+          <p>数据不离开浏览器，服务器零存储，隐私万无一失</p>
+        </div>
+      </div>
+      <div class="value-item">
+        <div class="value-char">效</div>
+        <div class="value-text">
+          <h3>高效</h3>
+          <p>Excel 导入、一键导出，从录入到交付只需几分钟</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta">
+  <div class="container">
+    <div class="cta-inner">
+      <div class="cta-text">
+        <h2>现在就开始制作报价单</h2>
+        <p>免费、无需注册、数据安全</p>
+      </div>
+      <a href="../" class="btn-white">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        立即使用
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Contact ===== -->
+<section class="contact" id="contact">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag">联系我们</span>
+      <h2>问题反馈 / 定制需求</h2>
+      <p class="section-desc">无论您遇到使用问题，还是需要定制化开发，我们都乐意倾听</p>
+    </div>
+    <br><br>
+    <div class="contact-grid">
+      <form class="contact-form" id="contactForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contactName">称呼</label>
+            <input type="text" id="contactName" placeholder="您的姓名" required />
+          </div>
+          <div class="form-group">
+            <label for="contactEmail">邮箱</label>
+            <input type="email" id="contactEmail" placeholder="name@example.com" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="contactType">需求类型</label>
+          <select id="contactType">
+            <option value="bug">问题反馈</option>
+            <option value="feature">功能建议</option>
+            <option value="custom">定制开发</option>
+            <option value="other">其他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="contactMsg">详细描述</label>
+          <textarea id="contactMsg" rows="5" placeholder="请描述您的问题或需求…" required></textarea>
+        </div>
+        <button type="submit" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          提交
+        </button>
+        <div class="form-status" id="formStatus"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-seal">报</div>
+        <span>报价易</span>
+      </div>
+      <div class="footer-copy">&copy; 2026 报价易 BaoJiaYi</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Navbar scroll effect
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 10);
+  });
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Contact form handler
+  const contactForm = document.getElementById('contactForm');
+  const formStatus = document.getElementById('formStatus');
+  contactForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('contactName').value.trim();
+    const email = document.getElementById('contactEmail').value.trim();
+    const type = document.getElementById('contactType').value;
+    const msg = document.getElementById('contactMsg').value.trim();
+
+    if (!name || !email || !msg) {
+      formStatus.textContent = '请填写所有必填项';
+      formStatus.className = 'form-status error';
+      return;
+    }
+
+    // Build mailto link as fallback (static site, no backend)
+    const subject = encodeURIComponent('[报价易] ' + ({bug:'问题反馈',feature:'功能建议',custom:'定制开发',other:'其他'}[type] || '反馈'));
+    const body = encodeURIComponent(`称呼: ${name}\n邮箱: ${email}\n类型: ${type}\n\n${msg}`);
+    window.location.href = `mailto:support@baojiayi.com?subject=${subject}&body=${body}`;
+
+    formStatus.textContent = '已打开邮件客户端，发送后我们将尽快回复您';
+    formStatus.className = 'form-status success';
+    contactForm.reset();
+  });
+</script>
+
+</body>
+</html>
