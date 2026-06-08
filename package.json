@@ -1,11 +1,15 @@
 {
-  "name": "quotation_generator",
-  "private": true,
-  "version": "0.0.0",
+  "name": "quotation-generator",
+  "version": "1.0.0",
+  "description": "报价易 - 专业报价单生成器",
+  "author": "spersonx",
+  "license": "MIT",
   "type": "module",
+  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
+    "build:electron": "vue-tsc -b && vite build && electron-builder",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -22,9 +26,57 @@
     "@types/node": "^24.12.3",
     "@vitejs/plugin-vue": "^6.0.6",
     "@vue/tsconfig": "^0.9.1",
+    "electron": "^42.3.3",
+    "electron-builder": "^26.15.2",
     "sass": "^1.100.0",
     "typescript": "~6.0.2",
     "vite": "^8.0.12",
+    "vite-plugin-electron": "^1.0.4",
+    "vite-plugin-electron-renderer": "^1.0.0",
     "vue-tsc": "^3.2.8"
+  },
+  "build": {
+    "appId": "com.baojiayi.app",
+    "productName": "报价易",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist-electron",
+      "dist/app"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "public/favicon.svg"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "public/favicon.svg"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "public/favicon.svg"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "报价易"
+    }
   }
 }
