@@ -5,12 +5,14 @@
   "author": "spersonx",
   "license": "Apache-2.0",
   "type": "module",
-  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
-    "build:electron": "vue-tsc -b && vite build && electron-builder",
-    "preview": "vite preview"
+    "build": "vue-tsc -b && vite build && xcopy js dist\\js\\ /Y /Q",
+    "preview": "vite preview",
+    "neu:update": "neu update",
+    "neu:run": "neu run",
+    "neu:build": "npm run build && neu build",
+    "neu:dev": "npm run build && neu run"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
@@ -23,60 +25,13 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@neutralinojs/neu": "^11.1.0",
     "@types/node": "^24.12.3",
     "@vitejs/plugin-vue": "^6.0.6",
     "@vue/tsconfig": "^0.9.1",
-    "electron": "^42.3.3",
-    "electron-builder": "^26.15.2",
     "sass": "^1.100.0",
     "typescript": "~6.0.2",
     "vite": "^8.0.12",
-    "vite-plugin-electron": "^1.0.4",
-    "vite-plugin-electron-renderer": "^1.0.0",
     "vue-tsc": "^3.2.8"
-  },
-  "build": {
-    "appId": "com.baojiayi.app",
-    "productName": "报价易",
-    "directories": {
-      "output": "release"
-    },
-    "files": [
-      "dist-electron",
-      "dist/app"
-    ],
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": ["x64"]
-        }
-      ],
-      "icon": "public/favicon.svg"
-    },
-    "mac": {
-      "target": [
-        {
-          "target": "dmg",
-          "arch": ["x64", "arm64"]
-        }
-      ],
-      "icon": "public/favicon.svg"
-    },
-    "linux": {
-      "target": [
-        {
-          "target": "AppImage",
-          "arch": ["x64"]
-        }
-      ],
-      "icon": "public/favicon.svg"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "shortcutName": "报价易"
-    }
   }
 }

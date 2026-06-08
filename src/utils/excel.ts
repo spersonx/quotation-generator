@@ -113,7 +113,7 @@ export function parseExcelToItems(file: File): Promise<ImportResult> {
   })
 }
 
-export function downloadExcelTemplate(): void {
+export async function downloadExcelTemplate(): Promise<void> {
   const headers = ['项目名称', '规格/描述', '单位', '数量', '单价']
   const example1 = ['示例项目A', '100cm×50cm', '个', 10, 99.9]
   const example2 = ['示例项目B', '200cm×100cm', '套', 5, 199.9]
@@ -124,5 +124,10 @@ export function downloadExcelTemplate(): void {
   ]
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, '项目明细')
-  XLSX.writeFile(wb, '报价单导入模板.xlsx')
+
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+  const blob = new Blob([wbout], { type: 'application/octet-stream' })
+
+  const { saveFile } = await import('./neutralino')
+  await saveFile(blob, '报价单导入模板.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 }

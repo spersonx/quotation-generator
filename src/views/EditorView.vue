@@ -163,7 +163,12 @@ async function handleExportPdf() {
   handleSave()
   const el = previewComponent.value?.$el
   if (el && quotation.value) {
-    await exportToPdf(el, `${quotation.value.quotationNo || '报价单'}.pdf`)
+    const result = await exportToPdf(el, `${quotation.value.quotationNo || '报价单'}.pdf`)
+    if (result.success && result.path) {
+      ElMessage.success('PDF 已保存到: ' + result.path)
+    } else if (result.success) {
+      ElMessage.success('PDF 已导出')
+    }
   }
 }
 
@@ -171,16 +176,21 @@ async function handleExportImage() {
   handleSave()
   const el = previewComponent.value?.$el
   if (el && quotation.value) {
-    await exportToImage(el, `${quotation.value.quotationNo || '报价单'}.png`)
+    const result = await exportToImage(el, `${quotation.value.quotationNo || '报价单'}.png`)
+    if (result.success && result.path) {
+      ElMessage.success('图片已保存到: ' + result.path)
+    } else if (result.success) {
+      ElMessage.success('图片已导出')
+    }
   }
 }
 
-function handleSaveToLocal() {
+async function handleSaveToLocal() {
   if (!quotation.value) return
   store.updateQuotation(quotation.value.id, { ...quotation.value })
   const json = JSON.stringify(quotation.value, null, 2)
   const filename = `${quotation.value.quotationNo || '报价单'}_${quotation.value.customer.name || '未命名'}.json`
-  downloadFile(json, filename, 'application/json')
+  await downloadFile(json, filename, 'application/json')
   ElMessage.success('已保存到本地，请妥善保管文件')
 }
 </script>

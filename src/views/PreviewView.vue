@@ -41,14 +41,24 @@ const quotation = computed(() => store.getQuotation(quotationId.value))
 async function handleExportPdf() {
   const el = previewComponent.value?.$el
   if (el) {
-    await exportToPdf(el, `${quotation.value?.quotationNo || '报价单'}.pdf`)
+    const result = await exportToPdf(el, `${quotation.value?.quotationNo || '报价单'}.pdf`)
+    if (result.success && result.path) {
+      ElMessage.success('PDF 已保存到: ' + result.path)
+    } else if (result.success) {
+      ElMessage.success('PDF 已导出')
+    }
   }
 }
 
 async function handleExportImage() {
   const el = previewComponent.value?.$el
   if (el) {
-    await exportToImage(el, `${quotation.value?.quotationNo || '报价单'}.png`)
+    const result = await exportToImage(el, `${quotation.value?.quotationNo || '报价单'}.png`)
+    if (result.success && result.path) {
+      ElMessage.success('图片已保存到: ' + result.path)
+    } else if (result.success) {
+      ElMessage.success('图片已导出')
+    }
   }
 }
 

@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -38,19 +38,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libarchive-tools
 
-      - name: Build & package
-        run: npm run build:electron
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Neutralino CLI & binaries
+        run: npx neu update
+
+      - name: Build frontend & Neutralino package
+        run: npm run neu:build
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.platform }}
-          path: release/*
+          path: dist/baojiayi/*
 
   create-release:
-    needs: release
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -69,9 +70,11 @@ jobs:
             ## 报价易 ${{ github.ref_name }}
 
             ### 下载
-            - **Windows**: `.exe` 安装包
-            - **macOS**: `.dmg` 安装包
-            - **Linux**: `.AppImage` 可执行文件
+            - **Windows**: `baojiayi-win_x64.exe`
+            - **macOS**: `baojiayi-mac_x64`
+            - **Linux**: `baojiayi-linux_x64`
+
+            每个平台需下载对应文件夹中的所有文件（可执行文件 + `resources.neu`），放在同一目录下运行。
 
             ### 更新内容
             请查看下方提交记录。

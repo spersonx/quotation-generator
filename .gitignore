@@ -14,7 +14,8 @@ node_modules
 dist
 dist-ssr
 dist-electron
-release
+bin
+js/
 
 # Local env files
 *.local
@@ -38,3 +39,6 @@ release
 # OS files
 Thumbs.db
 desktop.ini
+
+# Neutralino local files
+/favicon.png

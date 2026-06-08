@@ -1,10 +1,12 @@
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
+import { saveFile } from './neutralino'
+import type { SaveResult } from './neutralino'
 
 export async function exportToPdf(
   element: HTMLElement,
   filename: string = '报价单.pdf'
-): Promise<void> {
+): Promise<SaveResult> {
   const canvas = await html2canvas(element, {
     scale: 2,
     useCORS: true,
@@ -39,21 +41,22 @@ export async function exportToPdf(
     }
   }
 
-  pdf.save(filename)
+  const pdfBlob = pdf.output('blob')
+  return await saveFile(pdfBlob, filename, 'application/pdf')
 }
 
 export async function exportToImage(
   element: HTMLElement,
   filename: string = '报价单.png'
-): Promise<void> {
+): Promise<SaveResult> {
   const canvas = await html2canvas(element, {
     scale: 2,
     useCORS: true,
     backgroundColor: '#ffffff'
   })
 
-  const link = document.createElement('a')
-  link.download = filename
-  link.href = canvas.toDataURL('image/png')
-  link.click()
+  const blob = await new Promise<Blob>((resolve) => {
+    canvas.toBlob((b) => resolve(b!), 'image/png')
+  })
+  return await saveFile(blob, filename, 'image/png')
 }

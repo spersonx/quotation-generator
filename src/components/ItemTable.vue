@@ -168,8 +168,8 @@ function confirmImport() {
   importResult.value = null
 }
 
-function handleDownloadTemplate() {
-  downloadExcelTemplate()
+async function handleDownloadTemplate() {
+  await downloadExcelTemplate()
   ElMessage.success('模板已下载')
 }
 </script>
