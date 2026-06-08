@@ -11,6 +11,7 @@
 <p align="center">
   <a href="https://github.com/spersonx/quotation-generator/actions"><img src="https://img.shields.io/github/actions/workflow/status/spersonx/quotation-generator/deploy.yml?branch=main" alt="Build Status"></a>
   <a href="https://spersonx.github.io/quotation-generator/"><img src="https://img.shields.io/badge/在线演示-点击访问-blue" alt="Live Demo"></a>
+  <a href="https://github.com/spersonx/quotation-generator/releases"><img src="https://img.shields.io/github/v/release/spersonx/quotation-generator?label=桌面版下载" alt="Desktop Release"></a>
 </p>
 
 ---
@@ -18,6 +19,8 @@
 ## 简介
 
 **报价易**是一款面向企业销售与商务人员的在线报价单生成工具。无需注册、无需安装，打开浏览器即可快速创建专业报价单，支持 PDF 导出与 Excel 导入，数据完全保留在本地，保护客户隐私。
+
+同时提供 **桌面客户端**（Windows / macOS / Linux），离线可用，数据更安全。
 
 > **专 · 简 · 安 · 效** — 专注报价场景，简化操作流程，保障数据安全，提升工作效率。
 
@@ -34,6 +37,7 @@
 | **数据本地存储** | 所有数据保存在浏览器 localStorage，不上传服务器，关闭页面即销毁 |
 | **新手教程** | 首次使用自动弹出引导，覆盖首页到导出的完整流程 |
 | **历史记录** | 支持本地保存/加载 JSON 文件，方便归档与复用 |
+| **桌面客户端** | 支持 Windows / macOS / Linux，离线使用，数据不离开本机 |
 
 ---
 
@@ -45,11 +49,26 @@
 - **路由管理**: Vue Router
 - **PDF 导出**: html2canvas + jsPDF
 - **Excel 解析**: xlsx
+- **桌面客户端**: Electron + electron-builder
 - **静态部署**: GitHub Pages + GitHub Actions
 
 ---
 
 ## 快速开始
+
+### 在线使用
+
+直接访问 [在线演示](https://spersonx.github.io/quotation-generator/)，无需安装。
+
+### 桌面版下载
+
+前往 [Releases](https://github.com/spersonx/quotation-generator/releases) 下载对应平台安装包：
+
+| 平台 | 文件格式 | 说明 |
+|------|----------|------|
+| Windows | `.exe` | NSIS 安装包，支持自定义安装目录 |
+| macOS | `.dmg` | 支持 Intel (x64) 和 Apple Silicon (arm64) |
+| Linux | `.AppImage` | 免安装可执行文件 |
 
 ### 本地开发
 
@@ -61,17 +80,22 @@ cd quotation-generator
 # 安装依赖
 npm install
 
-# 启动开发服务器
+# 启动开发服务器（Web）
+npm run dev
+
+# 启动开发模式（桌面客户端）
 npm run dev
 ```
 
-### 构建生产版本
+### 构建
 
 ```bash
+# 构建 Web 版本
 npm run build
-```
 
-构建产物位于 `dist/` 目录，可直接部署到任意静态托管服务。
+# 构建桌面客户端安装包
+npm run build:electron
+```
 
 ---
 
@@ -79,16 +103,32 @@ npm run build
 
 本项目已配置 GitHub Actions 自动部署工作流。
 
-1. 在 GitHub 创建仓库，将代码推送至 `main` 分支
+1. 将代码推送至 `main` 分支
 2. 进入仓库 **Settings → Pages**
 3. Source 选择 **GitHub Actions**
 4. 每次 `push` 到 `main` 分支将自动触发部署
 
 ---
 
+## 发布桌面版
+
+推送版本标签即可自动构建并发布到 GitHub Releases：
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+GitHub Actions 会在 Windows / macOS / Linux 三个平台并行构建，自动创建 Release 并上传安装包。
+
+---
+
 ## 项目结构
 
 ```
+├── electron/
+│   ├── main.ts              # Electron 主进程
+│   └── preload.ts           # 预加载脚本
 ├── public/
 │   ├── favicon.svg          # 品牌图标
 │   └── landing/             # 品牌落地页
@@ -114,7 +154,8 @@ npm run build
 │   ├── App.vue              # 应用入口
 │   └── main.ts              # 入口文件
 ├── .github/workflows/
-│   └── deploy.yml           # GitHub Actions 部署配置
+│   ├── deploy.yml           # GitHub Pages 部署
+│   └── release.yml          # 桌面版自动发布
 ├── index.html
 ├── package.json
 ├── tsconfig.json
@@ -142,4 +183,4 @@ npm run build
 
 ## 许可证
 
-[MIT](LICENSE)
+[Apache-2.0](LICENSE)

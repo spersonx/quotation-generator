@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "报价易 - 专业报价单生成器",
   "author": "spersonx",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {
