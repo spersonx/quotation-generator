@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build && xcopy js dist\\js\\ /Y /Q",
+    "build": "vue-tsc -b && vite build && node -e \"require('fs').cpSync('js','dist/js',{recursive:true})\"",
     "preview": "vite preview",
     "neu:update": "neu update",
     "neu:run": "neu run",
