@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/你的用户名/quotation-generator/actions"><img src="https://img.shields.io/github/actions/workflow/status/你的用户名/quotation-generator/deploy.yml?branch=main" alt="Build Status"></a>
-  <a href="https://你的用户名.github.io/quotation-generator/"><img src="https://img.shields.io/badge/在线演示-点击访问-blue" alt="Live Demo"></a>
+  <a href="https://github.com/spersonx/quotation-generator/actions"><img src="https://img.shields.io/github/actions/workflow/status/spersonx/quotation-generator/deploy.yml?branch=main" alt="Build Status"></a>
+  <a href="https://spersonx.github.io/quotation-generator/"><img src="https://img.shields.io/badge/在线演示-点击访问-blue" alt="Live Demo"></a>
 </p>
 
 ---
@@ -55,7 +55,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/你的用户名/quotation-generator.git
+git clone https://github.com/spersonx/quotation-generator.git
 cd quotation-generator
 
 # 安装依赖
