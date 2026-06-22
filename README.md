@@ -11,7 +11,7 @@
 <p align="center">
   <a href="https://github.com/spersonx/quotation-generator/actions"><img src="https://img.shields.io/github/actions/workflow/status/spersonx/quotation-generator/deploy.yml?branch=main" alt="Build Status"></a>
   <a href="https://spersonx.github.io/quotation-generator/"><img src="https://img.shields.io/badge/在线演示-点击访问-blue" alt="Live Demo"></a>
-  <a href="https://github.com/spersonx/quotation-generator/releases"><img src="https://img.shields.io/github/v/release/spersonx/quotation-generator?label=桌面版下载" alt="Desktop Release"></a>
+  <a href="https://github.com/spersonx/quotation-generator/releases">
 </p>
 
 ---
@@ -60,17 +60,6 @@
 
 直接访问 [在线演示](https://spersonx.github.io/quotation-generator/)，无需安装。
 
-### 桌面版下载
-
-前往 [Releases](https://github.com/spersonx/quotation-generator/releases) 下载对应平台可执行文件：
-
-| 平台 | 文件 | 说明 |
-|------|------|------|
-| Windows | `baojiayi-win_x64.exe` | 64 位可执行文件 |
-| macOS | `baojiayi-mac_x64` | Intel 芯片 |
-| Linux | `baojiayi-linux_x64` | 64 位可执行文件 |
-
-下载后解压整个文件夹，双击可执行文件即可运行。
 
 ### 本地开发
 
@@ -106,29 +95,6 @@ npm run neu:build
 
 ---
 
-## 部署到 GitHub Pages
-
-本项目已配置 GitHub Actions 自动部署工作流。
-
-1. 将代码推送至 `main` 分支
-2. 进入仓库 **Settings → Pages**
-3. Source 选择 **GitHub Actions**
-4. 每次 `push` 到 `main` 分支将自动触发部署
-
----
-
-## 发布桌面版
-
-推送版本标签即可自动构建并发布到 GitHub Releases：
-
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-GitHub Actions 会在 Windows / macOS / Linux 三个平台并行构建，自动创建 Release 并上传可执行文件。
-
----
 
 ## 项目结构
 
